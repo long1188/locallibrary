@@ -1,8 +1,11 @@
 from django.db import models
+
 #Django 允许你定义一对一 (OneToOneField)，一对多 (ForeignKey) 和多对多 (ManyToManyField) 的关系。
 from django.db import models
 from django.urls import reverse
 import uuid#unique book instances
+from django.contrib.auth.models import User
+from datetime import date
 
 class Genre(models.Model):
     name=models.CharField(max_length=200,help_text="Enter a book genre")
@@ -39,6 +42,8 @@ class BookInstance(models.Model):
     book=models.ForeignKey('Book',on_delete=models.SET_NULL,null=True)
     imprint =models.CharField(max_length=200)
     due_back=models.DateField(null=True,blank=True)
+    borrower=models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+    #让用户可以借用书本实例,个模型和用户之间关联
     LOAN_STATUS=(
         ('m','Maintenance'),
         ('o','On loan'),
@@ -48,8 +53,20 @@ class BookInstance(models.Model):
     status=models.CharField(max_length=1,choices=LOAN_STATUS,blank=True,default='m',help_text='Book Availability')
     class Meta:
         ordering=["due_back"]
+        #当前用户的权限，存在名为 {{ perms }}的模板变量中,
+        #Django“app”中的特定变量名，来检查当前用户是否具有特定权限
+        #{{ perms.catalog.can_mark_returned }}
+
+        #使用 permission_required装饰器,PermissionRequiredMixin测试权限,param is the permission's name
+        permissions=(("can_mark_returned","set book as returned"),)
     def __str__(self):
         return '%s(%s)' % (self.id,self.book.title)
+
+    @property#添加一个属性，我们可以从模板中调用它
+    def is_overdue(self):#空的due_back字段，会导致 Django 抛出错误
+        if self.due_back and date.today()>self.due_back:
+            return True
+        return False
 
 class Author(models.Model):
     first_name=models.CharField(max_length=100)

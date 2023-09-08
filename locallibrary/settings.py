@@ -55,7 +55,7 @@ ROOT_URLCONF = 'locallibrary.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['./templates',],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -127,3 +127,8 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_REDIRECT_URL = '/'
+# Redirect to home URL after login (Default redirects to /accounts/profile/)
+#打开登出网址http://127.0.0.1:8080/accounts/logout/, 你所属的用户肯定会被登出，但你将被带到管理员登出页面
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#这会记录发送到命令行控制台的所有电子邮件（因此你可以从命令行控制台，复制密码重置链接）。

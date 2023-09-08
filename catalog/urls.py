@@ -16,6 +16,10 @@ urlpatterns = [
 #(?P<name>...)
 #它还捕获所有数字（?P<pk>\d+），并将它们传递给名为 'pk' 的参数中的视图。捕获的值始终作为字符串传递！
 
+urlpatterns += [
+    path('mybooks/', views.LoanedBooksByUserListView.as_view(), name='my-borrowed'),
+    path('liabrary/', views.Liabrary_Listview, name='all-borrowed'),
+]
 
 '''
 []匹配集合中的一个字符。例如，[abc] 将匹配 'a' 或 'b' 或 'c'。
