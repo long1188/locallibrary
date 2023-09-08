@@ -26,6 +26,9 @@ class Book(models.Model):
         return ', '.join([ genre.name for genre in self.genre.all()[:3] ])
     display_genre.short_description = 'Genre'
 
+    class Meta:
+        ordering = ['title']
+
 
 '''
 author field are null=True, which allows the database to store a Null value if no author is selected, 
@@ -58,3 +61,5 @@ class Author(models.Model):
 
     def __str__(self):
         return '%s ,%s' % (self.last_name,self.first_name)
+    class Meta:
+        ordering = ['last_name']
