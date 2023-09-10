@@ -58,7 +58,7 @@ class BookInstance(models.Model):
         #{{ perms.catalog.can_mark_returned }}
 
         #使用 permission_required装饰器,PermissionRequiredMixin测试权限,param is the permission's name
-        permissions=(("can_mark_returned","set book as returned"),)
+        permissions=(("can mark returned","set book as returned"),)
     def __str__(self):
         return '%s(%s)' % (self.id,self.book.title)
 

@@ -1,9 +1,61 @@
-from django.shortcuts import render
+import datetime
+
+from django.shortcuts import render,get_object_or_404
 from django.views import generic
 from .models import Book,BookInstance,Author,Genre
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from .forms import RenewBookForm,RenewBookModelForm
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+
+#通用编辑视图
+class AuthorCreate(CreateView):
+    model = Author
+    fields = '__all__'
+    initial={'date_of_death':'05/01/2018',}
+
+class AuthorUpdate(UpdateView):
+    model = Author
+    fields = ['first_name','last_name','date_of_birth','date_of_death']
+
+class AuthorDelete(DeleteView):
+    model = Author
+    success_url = reverse_lazy('authors')#reverse_lazy()是一个延迟执行的reverse()版本
+
+
+
+# def renew_ModelForm(request):
+#     #book_inst=get_object_or_404(BookInstance,id=id)
+#     #print(book_inst)
+#
+#     if request.method=='POST':
+#         form=RenewBookModelForm(request.POST)
+#         if form.is_valid():
+#             #book_inst.due_back=form.cleaned_data['renewal_date']
+#             return HttpResponseRedirect(reverse('all-borrowed'))
+#     else:
+#         #proposed_renewal_date=datetime.date.today()+datetime.timedelta(weeks=3)
+#         form=RenewBookModelForm()#initial={'renewal_date':proposed_renewal_date,}
+#     return render(request,'catalog/book_renew_librarian.html',{'form':form})
+@permission_required('set book as returned')#将视图，限制为图书馆员可以访问
+def renew_book_librarian(request,pk):
+    book_inst=get_object_or_404(BookInstance,pk=pk)
+    if request.method=='POST':
+        form=RenewBookForm(request.POST)
+        if form.is_valid():
+            book_inst.due_back=form.cleaned_data['renewal_date']
+            book_inst.save()
+            return HttpResponseRedirect(reverse('all-borrowed'))
+    else:
+        proposed_renewal_date=datetime.date.today()+datetime.timedelta(weeks=3)
+        form=RenewBookForm(initial={'renewal_date':proposed_renewal_date,})
+    return render(request,'catalog/book_renew_librarian.html',{'form':form,'bookinst':book_inst})
+#如果表单无效，我们再次调用render() ，但这次在上下文中传递的表单值将包含错误消息
 # Create your views here.
 @permission_required('set book as returned')
 def Liabrary_Listview(request):

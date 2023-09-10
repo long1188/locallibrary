@@ -1,5 +1,6 @@
-from django.urls import path
+from django.urls import path,re_path
 from catalog import views
+import re
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -31,3 +32,13 @@ urlpatterns += [
 要对多个资源，使用相同的视图，
 URL 中传递其他选项,被声明为一个字典{'my_template_name': 'some_path'}, 
 '''
+urlpatterns += [
+    path('book/<uuid:pk>/renew/', views.renew_book_librarian, name='renew-book-librarian'),
+#path('book/<uuid:pk>/renew1/', views.RenewBookModelForm, name='renew-modelform-librarian'),
+#re_path('book/(?P<id>\d+)/$', views.RenewBookModelForm),
+]
+urlpatterns += [
+    path('author/create/', views.AuthorCreate.as_view(), name='author_create'),
+    path('author/<int:pk>/update/', views.AuthorUpdate.as_view(), name='author_update'),
+    path('author/<int:pk>/delete/', views.AuthorDelete.as_view(), name='author_delete'),
+]
